@@ -1,0 +1,97 @@
+services:
+  db:
+    image: mariadb:10.11
+    restart: always
+    tty: true
+    container_name: laravel_db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    restart: always
+    container_name: laravel_phpmyadmin
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8090:80"
+    environment:
+      - PMA_HOST=${DB_HOST}
+      - PMA_USER=${ROOT_USER}
+      - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    networks:
+      - app-network
+
+  application:
+    build:
+      context: .
+      dockerfile: dockerfiles/apache.dockerfile
+    ports:
+      - "8080:80"
+    volumes:
+      - ${APP_SRC_PATH}:/var/www/html
+    user: "${UID}:${GID}"
+    depends_on:
+      db:
+        condition: service_healthy
+    container_name: laravel_app
+    networks:
+      - app-network
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=${DB_HOST}
+
+  composer:
+    build:
+      context: .
+      dockerfile: dockerfiles/composer.dockerfile
+    volumes:
+      - ${APP_SRC_PATH}:/var/www/html
+    depends_on:
+      - application
+    networks:
+      - app-network
+    entrypoint: ["composer"]
+    working_dir: /var/www/html
+    profiles:
+      - tools
+
+  artisan:
+    build:
+      context: .
+      dockerfile: dockerfiles/apache.dockerfile
+    volumes:
+      - ${APP_SRC_PATH}:/var/www/html
+    depends_on:
+      - application
+    networks:
+      - app-network
+    entrypoint: ["php", "/var/www/html/artisan"]
+    working_dir: /var/www/html
+    profiles:
+      - tools
+
+volumes:
+  db_data:
+
+networks:
+  app-network:
+    driver: bridge
