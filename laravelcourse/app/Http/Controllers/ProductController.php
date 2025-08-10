@@ -48,16 +48,16 @@ class ProductController extends Controller
     public function create(): View
     {
     $viewData = [];
-    $viewData["title"] = "Create product";
+    $viewData['title'] = 'Create product';
 
-    return view('product.create') -> with("viewData",$viewData);
+    return view('product.create') -> with('viewData',$viewData);
     }
 
     public function save(Request $request): View
     {
         $request -> validate([
-        "name" => "required",
-        "price" => "required|gt:0"
+        'name' => 'required',
+        'price' => 'required|gt:0'
         ]);
 
         $viewData = [];
@@ -67,7 +67,7 @@ class ProductController extends Controller
         $viewData['product_price'] = $request -> input('price');
 
         // dd($request->all());
-        return view('product.successCreation') -> with('viewData', $viewData);
+        return view('product.save') -> with('viewData', $viewData);
     }
 
 }
