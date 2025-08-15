@@ -10,13 +10,13 @@
         <div class="col-md-8">
             <div class="card-body">
                 <h5 class="card-title">
-                @if($viewData['product']['price'] > 100)
+                    @if($viewData['product']['price'] > 100)
                     <span style="color: red;">{{ $viewData['product']['name'] }}</span>
-                @else
+                    @else
                     {{ $viewData['product']['name'] }}
-                @endif
+                    @endif
                 </h5>
-                <p class="card-text">{{ $viewData['product']['description'] }}</p>
+                <p class="card-text">{{ $viewData['product']['price'] }}</p>
             </div>
         </div>
     </div>
