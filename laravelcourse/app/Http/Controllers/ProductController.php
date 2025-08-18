@@ -1,14 +1,11 @@
 <?php
 
-
 namespace App\Http\Controllers;
 
-
-use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
 use App\Models\Product;
-
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ProductController extends Controller
 {
@@ -22,16 +19,16 @@ class ProductController extends Controller
         return view('product.index')->with('viewData', $viewData);
     }
 
-    public function show(string $id): View | RedirectResponse
+    public function show(string $id): View|RedirectResponse
     {
-        if (!is_numeric($id)) {
+        if (! is_numeric($id)) {
             return redirect()->route('product.index');
         }
 
         $viewData = [];
         $product = Product::findOrFail($id);
-        $viewData['title'] = $product['name'] . ' - Online Store';
-        $viewData['subtitle'] = $product['name'] . ' - Product information';
+        $viewData['title'] = $product['name'].' - Online Store';
+        $viewData['subtitle'] = $product['name'].' - Product information';
         $viewData['product'] = $product;
 
         return view('product.show')->with('viewData', $viewData);
@@ -49,7 +46,7 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'price' => 'required|gt:0'
+            'price' => 'required|gt:0',
         ]);
         Product::create($request->only(['name', 'price']));
 

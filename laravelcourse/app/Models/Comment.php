@@ -1,0 +1,60 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Comment extends Model
+{
+    use HasFactory;
+
+    /**
+     * PRODUCT ATTRIBUTES strange
+     * $this->attributes['product_id'] - int contains the comment primary key (id)
+     * $this->attributes['description'] - string - contains the comment description
+     * $this->product - Product - contains the associated Product
+     */
+    protected $fillable = ['description', 'product_id'];
+
+    public function getId(): int
+    {
+        return $this->attributes['id'];
+    }
+
+    public function setId(int $id): void
+    {
+        $this->attributes['id'] = $id;
+    }
+
+    public function getDescription(): string
+    {
+        return $this->attributes['description'];
+    }
+
+    public function setDescription(string $description): void
+    {
+        $this->attributes['description'] = $description;
+    }
+
+    public function getProductId(): int
+    {
+        return $this->attributes['product_id'];
+    }
+
+    public function setProductId(int $productId): void
+    {
+        $this->attributes['product_id'] = $productId;
+    }
+
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function setProduct(Product $product): void
+    {
+        $this->product()->associate($product);
+    }
+}
