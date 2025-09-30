@@ -5,7 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use function Laravel\Prompts\search;
 
 class Product extends Model
 {
@@ -65,5 +67,23 @@ class Product extends Model
     public function setComments(Collection $comments): void
     {
         $this->comments = $comments;
+    }
+
+    // Utility Methods
+    public function scopeFilter(Builder $query, ?string $search, ?int $minPrice, ?int $maxPrice): Builder
+    {
+        if ($search) {
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        if ($minPrice) {
+            $query->where('price', '>=', $minPrice);
+        }
+
+        if ($maxPrice) {
+            $query->where('price', '<=', $maxPrice);
+        }
+
+        return $query;
     }
 }
